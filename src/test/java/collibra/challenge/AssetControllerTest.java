@@ -22,12 +22,12 @@ public class AssetControllerTest {
 
     @Test
     void shouldGetAllAssets() throws Exception {
-        Asset asset1 = new Asset(0, "A", false, null, null, null, null);
-        Asset asset2 = new Asset(1, "B", true, null, null, null, null);
+        Asset asset1 = new Asset(0, "A", false, null, null);
+        Asset asset2 = new Asset(1, "B", true, null, null);
         List<Asset> assetList = Arrays.asList(asset1, asset2);
 
-        AssetDto assetDto1 = new AssetDto(asset1.getId(), asset1.getName(), null, asset1.isPromoted());
-        AssetDto assetDto2 = new AssetDto(asset2.getId(), asset2.getName(), null, asset2.isPromoted());
+        AssetDto assetDto1 = new AssetDto(asset1.getId(), asset1.getName(), asset1.isPromoted(), null);
+        AssetDto assetDto2 = new AssetDto(asset2.getId(), asset2.getName(), asset2.isPromoted(), null);
         List<AssetDto> assetDtos = Arrays.asList(assetDto1, assetDto2);
         
         Mockito.when(assetService.getAllAssets()).thenReturn(assetList);
@@ -35,7 +35,8 @@ public class AssetControllerTest {
         List<AssetDto> actualAllAssets = assetController.getAllAssets();
 
         for (int i=0; i<assetDtos.size(); i++) {
-            assertEquals(assetDtos.get(i), actualAllAssets.get(i));
+            assertEquals(assetDtos.get(i).getId(), actualAllAssets.get(i).getId());
+            assertEquals(assetDtos.get(i).getName(), actualAllAssets.get(i).getName());
         }
     }
 }

@@ -1,5 +1,6 @@
 package collibra.challenge;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -8,12 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.GraphLookupOperation;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -22,14 +18,11 @@ public class AssetService {
     @Autowired
     private AssetRepository assetRepository;
 
-    private MongoTemplate mongoTemplate;
-
     private RabbitTemplate rabbitTemplate;
 
     private Logger logger = LoggerFactory.getLogger(AssetController.class);
 
-    public AssetService(MongoTemplate mongoTemplate, RabbitTemplate rabbitTemplate) {
-        this.mongoTemplate = mongoTemplate;
+    public AssetService(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
 
@@ -66,9 +59,9 @@ public class AssetService {
 
     public void deleteAsset(int id) throws Exception {
         assetRepository.deleteById(id);
-        Optional<List<Asset>> children = getAllChildren(id);
-        if (children.isPresent()) {
-            assetRepository.deleteAll(children.get());
+        Optional<List<Asset>> descendents = getDescendents(id);
+        if (descendents.isPresent()) {
+            assetRepository.deleteAll(descendents.get());
         }
         rabbitTemplate.send("asset.deleted", null);
     }
@@ -82,32 +75,45 @@ public class AssetService {
         asset.setPromoted(true);
         rabbitTemplate.send("asset.promoted", null);
         Asset newAsset = assetRepository.save(asset);
-        Optional<List<Asset>> children = getAllChildren(id);
-        if (children.isPresent()) {
-            for (Asset childAsset : children.get()) {
+        Optional<List<Asset>> descendents = getDescendents(id);
+        if (descendents.isPresent()) {
+            for (Asset childAsset : descendents.get()) {
                 childAsset.setPromoted(true);
                 assetRepository.save(childAsset);
+            }
+        }
+        Optional<List<Asset>> ancestors = getAncestors(id);
+        if (ancestors.isPresent()) {
+            for (Asset parentAsset : ancestors.get()) {
+                parentAsset.setPromoted(true);
+                assetRepository.save(parentAsset);
             }
         }
         return newAsset;
     }
     
-    public Optional<List<Asset>> getAllChildren(int rootId) throws Exception {
-        final Criteria byAssetId = new Criteria("id").is(rootId);
-        
-        GraphLookupOperation graphLookup = GraphLookupOperation.builder()
-                .from("assets")
-                .startWith("$id")
-                .connectFrom("id")
-                .connectTo("parentId")
-                .as("children");
-        
-        Aggregation aggregation = Aggregation.newAggregation(Aggregation.match(byAssetId), graphLookup);
-        List<Asset> results = mongoTemplate.aggregate(aggregation, "assets", Asset.class).getMappedResults();
-        return CollectionUtils.isEmpty(results) ? Optional.empty() : Optional.of(results);
+    public Optional<List<Asset>> getDescendents(int rootId) throws Exception {
+        Optional<Asset> rootAsset = assetRepository.findById(rootId);
+        if (rootAsset.isEmpty()) {
+            throw new EntityNotFoundException();
+        }
+        Asset asset = rootAsset.get();
+        final int RECURSION_LIMIT = 2;
+        List<Asset> descendents = asset.getChildren();
+        List<Asset> children = asset.getChildren();
+        List<Asset> newChildren = new ArrayList<Asset>();
+        for (int i=0; i<RECURSION_LIMIT; i++) {
+            for (Asset c : children) {
+                newChildren.addAll(c.getChildren());
+            }
+            descendents.addAll(newChildren);
+            children = newChildren;
+            newChildren = new ArrayList<Asset>();
+        }
+        return descendents.size() > 0 ? Optional.of(descendents) : Optional.empty();
     }
 
-    public Optional<List<Asset>> getAllAncestors(int childId) throws Exception {
+    public Optional<List<Asset>> getAncestors(int childId) throws Exception {
         Optional<Asset> childAsset = assetRepository.findById(childId);
         if (childAsset.isEmpty()) {
             throw new EntityNotFoundException();
@@ -116,7 +122,7 @@ public class AssetService {
         final int RECURSION_LIMIT = 3;
         List<Asset> ancestors = Arrays.asList();
         for (int i=0; i<RECURSION_LIMIT; i++) {
-            Optional<Asset> parentAsset = assetRepository.findById(asset.getParentId());
+            Optional<Asset> parentAsset = assetRepository.findById(asset.getParent().getId());
             if (parentAsset.isEmpty())
                 break;
             asset = parentAsset.get();

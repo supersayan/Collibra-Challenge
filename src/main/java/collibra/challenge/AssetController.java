@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 public class AssetController {
@@ -52,13 +52,14 @@ public class AssetController {
     }
 
     @DeleteMapping("/asset/{id}")
-    public void deleteAsset(@PathVariable Integer id) throws Exception {
+    public Boolean deleteAsset(@PathVariable Integer id) throws Exception {
         logger.info("Called delete asset");
         assetService.deleteAsset(id);
+        return true;
     }
 
     @PutMapping("/asset/{id}/promote")
-    public AssetDto promoteAsset(@PathVariable Integer id) {
+    public AssetDto promoteAsset(@PathVariable Integer id) throws Exception {
         logger.info("Called promote asset");
         return convertToDto(assetService.promoteAsset(id));
     }
@@ -69,7 +70,7 @@ public class AssetController {
         return AssetDto.builder()
                 .id(asset.getId())
                 .name(asset.getName())
-                .parentId(asset.getParentId())
+                .parent(AssetDto.builder().id(asset.getParent() == null ? null : asset.getParent().getId()).build())
                 .isPromoted(asset.isPromoted())
                 .build();
     }
@@ -78,8 +79,7 @@ public class AssetController {
         return Asset.builder()
                 .id(assetDto.getId())
                 .name(assetDto.getName() != null ? assetDto.getName() : "New Asset")
-                .parentId(assetDto.getParentId())
-
+                .parent(Asset.builder().id(assetDto.getParent() == null ? null : assetDto.getParent().getId()).build())
                 .isPromoted(assetDto.getIsPromoted() != null ? assetDto.getIsPromoted() : false)
                 .build();
     }

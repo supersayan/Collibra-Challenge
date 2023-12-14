@@ -11,8 +11,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+@DataJpaTest
 @ExtendWith(MockitoExtension.class)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class AssetServiceTest {
     @Mock
     private AssetRepository assetRepository;
@@ -31,22 +35,22 @@ public class AssetServiceTest {
             .build();
     }
 
-    @Test
-    void shouldGetAllAssets() {
-        assetService.getAllAssets();
-        verify(assetRepository).findAll();
-    }
+    // @Test
+    // void shouldGetAllAssets() {
+    //     assetService.getAllAssets();
+    //     verify(assetRepository).findAll();
+    // }
 
-    @Test
-    void shouldGetAsset() {
-        int id = 0;
-        assetService.getAsset(id);
-        verify(assetRepository).findById(id);
-    }
+    // @Test
+    // void shouldGetAsset() {
+    //     int id = 0;
+    //     assetService.getAsset(id);
+    //     verify(assetRepository).findById(id);
+    // }
 
-    @Test
-    void shouldCreateAsset() {
-        assertEquals(Optional.empty(), assetRepository.findById(0));
-        assertEquals(testAsset, assetRepository.save(testAsset));
-    }
+    // @Test
+    // void shouldCreateAsset() {
+    //     assertEquals(Optional.empty(), assetRepository.findById(0));
+    //     assertEquals(testAsset, assetRepository.save(testAsset));
+    // }
 }

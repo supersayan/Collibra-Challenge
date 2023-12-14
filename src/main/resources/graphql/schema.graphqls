@@ -1,0 +1,23 @@
+type Query {
+    getAllAssets: [Asset]
+    getAsset(id: ID): Asset
+}
+
+type Mutation {
+    createAsset(asset: AssetCreateInput): Asset
+    updateAsset(id: ID, asset: AssetCreateInput): Asset
+    deleteAsset(id: ID): Boolean
+    promoteAsset(id: ID): Asset
+}
+
+type Asset {
+    id: ID
+    name: String
+    isPromoted: Boolean
+    parent: Asset
+}
+
+input AssetCreateInput {
+    id: ID
+    name: String
+}

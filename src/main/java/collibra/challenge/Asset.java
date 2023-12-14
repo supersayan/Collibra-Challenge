@@ -2,14 +2,22 @@ package collibra.challenge;
 
 import java.util.List;
 
-import org.springframework.data.mongodb.core.mapping.Document;
-
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
@@ -17,27 +25,28 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-@RequiredArgsConstructor
 
 @Entity
-@Document(collection = "assets")
+@Table(name = "assets")
 public class Asset {
+    public Asset() {}
+
     @Id
+    @GeneratedValue
     private Integer id;
 
+    @Column
     private String name;
 
+    @Column(name = "is_promoted")
     private boolean isPromoted;
 
-    private Integer parentId;
-
-    @Transient
+    @ManyToOne
+    @JoinColumn(name = "parent_id", foreignKey = @ForeignKey(name = "id"))
     private Asset parent;
 
     @Transient
-    private List<Integer> childrenIds;
-
-    @Transient
+    @OneToMany(mappedBy = "parent")
     private List<Asset> children;
 }
 
