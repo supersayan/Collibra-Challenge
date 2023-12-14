@@ -6,9 +6,9 @@ To start locally:
 ```
 .\mvnw spring-boot:run
 ```
-Then query `localhost:8080/asset`
+Then query `localhost:8080/asset` This does not start a database.
 
-To run in a container, with docker installed:
+To run in a container, complete with database, with docker installed:
 ```
 docker build .
 docker compose up
