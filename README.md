@@ -33,10 +33,13 @@ I also wasn't able to get the Swagger UI working despite including the dependenc
 
 I attempted to include RabbitMQ for eventing but it isn't properly implemented. I assume when "A new system is informed of the promotion" that would involve sending a RabbitMQ message to another system.
 
+Read is tested.
+
 Todos:
 
-- Working API (debugging semantic errors in Docker)
+- Test Create, Update, Delete
+- Test Promotion
 - Swagger UI
 - Custom exceptions
 - Model mapper
-- Test coverage
+- Unit test coverage
