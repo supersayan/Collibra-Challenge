@@ -10,10 +10,16 @@ Then query `localhost:8080/asset` This does not start a database.
 
 To run in a container, complete with database, with docker installed:
 ```
-docker build .
+docker compose build
+docker compose pull
 docker compose up
 ```
 Then query `localhost:6868/asset`
+
+To stop:
+```
+docker compose down -v
+```
 
 - Getting an asset: `GET /asset/{id}`
 - Get all assets: `GET /asset`

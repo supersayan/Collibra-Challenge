@@ -72,20 +72,20 @@ public class AssetService {
             throw new EntityNotFoundException();
         }
         Asset asset = assetFromRepo.get();
-        asset.setPromoted(true);
+        asset.setIsPromoted(true);
         rabbitTemplate.send("asset.promoted", null);
         Asset newAsset = assetRepository.save(asset);
         Optional<List<Asset>> descendents = getDescendents(id);
         if (descendents.isPresent()) {
             for (Asset childAsset : descendents.get()) {
-                childAsset.setPromoted(true);
+                childAsset.setIsPromoted(true);
                 assetRepository.save(childAsset);
             }
         }
         Optional<List<Asset>> ancestors = getAncestors(id);
         if (ancestors.isPresent()) {
             for (Asset parentAsset : ancestors.get()) {
-                parentAsset.setPromoted(true);
+                parentAsset.setIsPromoted(true);
                 assetRepository.save(parentAsset);
             }
         }

@@ -26,8 +26,8 @@ public class AssetControllerTest {
         Asset asset2 = new Asset(1, "B", true, null, null);
         List<Asset> assetList = Arrays.asList(asset1, asset2);
 
-        AssetDto assetDto1 = new AssetDto(asset1.getId(), asset1.getName(), asset1.isPromoted(), null);
-        AssetDto assetDto2 = new AssetDto(asset2.getId(), asset2.getName(), asset2.isPromoted(), null);
+        AssetDto assetDto1 = new AssetDto(asset1.getId(), asset1.getName(), asset1.getIsPromoted(), null);
+        AssetDto assetDto2 = new AssetDto(asset2.getId(), asset2.getName(), asset2.getIsPromoted(), null);
         List<AssetDto> assetDtos = Arrays.asList(assetDto1, assetDto2);
         
         Mockito.when(assetService.getAllAssets()).thenReturn(assetList);

@@ -71,7 +71,7 @@ public class AssetController {
                 .id(asset.getId())
                 .name(asset.getName())
                 .parent(AssetDto.builder().id(asset.getParent() == null ? null : asset.getParent().getId()).build())
-                .isPromoted(asset.isPromoted())
+                .isPromoted(asset.getIsPromoted())
                 .build();
     }
 
