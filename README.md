@@ -1,5 +1,7 @@
 # Collibra Challenge #
 
+Note: the current api isn't fully functional, see branch fix-asset for fixes post-deadline
+
 Spring Boot application for RESTful API managing assets using MySQL for persistence.
 
 To start locally:
