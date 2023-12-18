@@ -12,6 +12,8 @@ docker compose up
 ```
 Then query `localhost:6868/asset`
 
+You can also open the API docs in `http://localhost:6868/swagger-ui/index.html#/` to view Swagger UI, or `http://localhost:6868/api-docs` in JSON.
+
 To stop:
 ```
 docker compose down -v
@@ -29,12 +31,13 @@ I also wasn't able to get the Swagger UI working despite including the dependenc
 
 I attempted to include RabbitMQ for eventing but it isn't properly implemented. I assume when "A new system is informed of the promotion" that would involve sending a RabbitMQ message to another system.
 
-Read is tested.
-
-Todos:
-
-- Test Create, Update, Delete
+Todos: 
+- [x] Read
+- [x] Create
+- Test Update
+- Test Delete
 - Test Promotion
-- Swagger UI
+- [x] Swagger UI
 - Custom exceptions
 - Unit test coverage
+- RabbitMQ

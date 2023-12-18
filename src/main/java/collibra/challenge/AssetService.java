@@ -18,13 +18,13 @@ public class AssetService {
     @Autowired
     private AssetRepository assetRepository;
 
-    private RabbitTemplate rabbitTemplate;
+    // private RabbitTemplate rabbitTemplate;
 
     private Logger logger = LoggerFactory.getLogger(AssetController.class);
 
-    public AssetService(RabbitTemplate rabbitTemplate) {
-        this.rabbitTemplate = rabbitTemplate;
-    }
+    // public AssetService(RabbitTemplate rabbitTemplate) {
+    //     this.rabbitTemplate = rabbitTemplate;
+    // }
 
     public List<Asset> getAllAssets() {
         return assetRepository.findAll();
@@ -42,7 +42,7 @@ public class AssetService {
     public Asset createAsset(Asset asset) {
         logger.debug("New asset: ", asset);
         Asset newAsset = assetRepository.save(asset);
-        rabbitTemplate.convertAndSend("asset.created", newAsset);
+        // rabbitTemplate.send("asset.created", null);
         return newAsset;
     }
 
@@ -53,7 +53,12 @@ public class AssetService {
         }
         Asset asset = assetFromRepo.get();
         asset.setName(newAsset.getName());
-        Optional<Asset> parentAsset = assetRepository.findById(null);
+        if (newAsset.getParent() != null) {
+            Optional<Asset> parentAsset = assetRepository.findById(null);
+            if (parentAsset.isPresent()) {
+                asset.setParent(parentAsset.get());
+            }
+        }
         logger.debug("Update asset: ", newAsset);
         return assetRepository.save(asset);
     }
@@ -64,7 +69,7 @@ public class AssetService {
         if (descendents.isPresent()) {
             assetRepository.deleteAll(descendents.get());
         }
-        rabbitTemplate.send("asset.deleted", null);
+        // rabbitTemplate.send("asset.deleted", null);
     }
 
     public Asset promoteAsset(int id) throws Exception {
@@ -74,7 +79,7 @@ public class AssetService {
         }
         Asset asset = assetFromRepo.get();
         asset.setIsPromoted(true);
-        rabbitTemplate.send("asset.promoted", null);
+        // rabbitTemplate.send("asset.promoted", null);
         Asset newAsset = assetRepository.save(asset);
         Optional<List<Asset>> descendents = getDescendents(id);
         if (descendents.isPresent()) {
