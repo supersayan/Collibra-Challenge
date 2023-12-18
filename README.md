@@ -12,7 +12,7 @@ Then query `localhost:8080/asset` This does not start a database.
 
 To run in a container, complete with database, with docker installed:
 ```
-docker build .
+docker compose build
 docker compose up
 ```
 Then query `localhost:6868/asset`
