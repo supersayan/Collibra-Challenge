@@ -2,11 +2,7 @@
 
 Spring Boot application for RESTful API managing assets using MySQL for persistence.
 
-To start locally:
-```
-.\mvnw spring-boot:run
-```
-Then query `localhost:8080/asset` This does not start a database.
+Work in progress.
 
 To run in a container, complete with database, with docker installed:
 ```
@@ -27,7 +23,7 @@ docker compose down -v
 - Update an asset: `PUT /asset`
 - Delete an asset: `DELETE /asset`
 
-See `AssetService.java` for CRUD and promotion logic. The API doesn't actually work but the code is there. Currently it is complaining about Asset not having a default constructor after I added it. For promotion I assume that promoting descendents and ancestors doesn't recurse forever to protect from a loop. `AssetServiceTest.java` also doesn't work because of issues mocking the repository and so I commented the tests out. Ideally we have tests checking for success and failure + edge cases for each route.
+See `AssetService.java` for CRUD and promotion logic. The API doesn't actually work but the code is there. For promotion I assume that promoting descendents and ancestors doesn't recurse forever to protect from a loop. `AssetServiceTest.java` also doesn't work because of issues mocking the repository and so I commented the tests out. Ideally we have tests checking for success and failure + edge cases for each route.
 
 I also wasn't able to get the Swagger UI working despite including the dependency for it and trying whatever I could find online, but I did write the proposed schema in GraphQL at `./src/main/resources/graphql/schema.graphqls`.
 
@@ -41,5 +37,4 @@ Todos:
 - Test Promotion
 - Swagger UI
 - Custom exceptions
-- Model mapper
 - Unit test coverage

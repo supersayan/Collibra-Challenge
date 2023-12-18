@@ -16,6 +16,6 @@ public class AssetDto {
 
     private Boolean isPromoted;
 
-    private AssetDto parent;
+    private Integer parentId;
 }
 

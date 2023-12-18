@@ -53,6 +53,7 @@ public class AssetService {
         }
         Asset asset = assetFromRepo.get();
         asset.setName(newAsset.getName());
+        Optional<Asset> parentAsset = assetRepository.findById(null);
         logger.debug("Update asset: ", newAsset);
         return assetRepository.save(asset);
     }

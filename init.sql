@@ -1,7 +1,7 @@
 CREATE TABLE assets (
-    id INT,
+    id INT NOT NULL AUTO_INCREMENT,
     name VARCHAR(255),
-    is_promoted BOOL,
+    is_promoted BOOL NOT NULL DEFAULT 0,
     parent_id int,
     PRIMARY KEY (id),
     FOREIGN KEY (parent_id) REFERENCES assets(id)
