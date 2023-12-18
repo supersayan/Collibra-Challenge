@@ -64,11 +64,11 @@ public class AssetService {
     }
 
     public void deleteAsset(int id) throws Exception {
-        assetRepository.deleteById(id);
         Optional<List<Asset>> descendents = getDescendents(id);
         if (descendents.isPresent()) {
             assetRepository.deleteAll(descendents.get());
         }
+        assetRepository.deleteById(id);
         // rabbitTemplate.send("asset.deleted", null);
     }
 
