@@ -2,6 +2,7 @@ package collibra.challenge;
 
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +22,14 @@ public class AssetController {
 
     private Logger logger = LoggerFactory.getLogger(AssetController.class);
 
+    private final ModelMapper mapper = new ModelMapper();
+
     @GetMapping("/asset")
     @ResponseBody
     public List<AssetDto> getAllAssets() {
         logger.info("Called get all assets");
         return assetService.getAllAssets().stream()
-                .map(this::convertToDto)
+                .map((asset) -> mapper.map(asset, AssetDto.class))
                 .toList();
     }
 
@@ -34,21 +37,49 @@ public class AssetController {
     @ResponseBody
     public AssetDto getAsset(@PathVariable("id") Integer id) {
         logger.info("Called get asset " + id);
-        return convertToDto(assetService.getAsset(id));
+        return mapper.map(assetService.getAsset(id), AssetDto.class);
     }
     
     @PostMapping("/asset")
     @ResponseBody
     public AssetDto createAsset(@RequestBody AssetDto assetDto) {
         logger.info("Called create asset");
-        return convertToDto(assetService.createAsset(convertToEntity(assetDto)));
+
+        // Converter<Integer, Asset> idToAsset = ctx -> {
+        //     Asset a = new Asset();
+        //     a.setId(ctx.getSource());
+        //     return a;
+        // };
+        // TypeMap<AssetDto, Asset> propertyMapper = this.mapper.createTypeMap(AssetDto.class, Asset.class);
+        // propertyMapper.addMappings(mapper -> {
+        //     mapper.using(idToAsset).map(AssetDto::getParentId, Asset::setParent);
+        // });
+
+        // mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
+
+        Asset asset = mapper.map(assetDto, Asset.class);
+        if (assetDto.getParentId() != null) {
+            Asset parent = new Asset();
+            parent.setId(assetDto.getParentId());
+            asset.setParent(parent);
+        }
+
+        return mapper.map(assetService.createAsset(asset), AssetDto.class);
     }
 
     @PutMapping("/asset/{id}")
     @ResponseBody
     public AssetDto updateAsset(@PathVariable Integer id, @RequestBody AssetDto assetDto) {
         logger.info("Called update asset");
-        return convertToDto(assetService.updateAsset(id, convertToEntity(assetDto)));
+
+        Asset asset = mapper.map(assetDto, Asset.class);
+        if (assetDto.getParentId() != null) {
+            Asset parent = new Asset();
+            parent.setId(assetDto.getParentId());
+            asset.setParent(parent);
+        }
+
+        return mapper.map(assetService.updateAsset(id, asset), AssetDto.class);
     }
 
     @DeleteMapping("/asset/{id}")
@@ -56,32 +87,6 @@ public class AssetController {
         logger.info("Called delete asset");
         assetService.deleteAsset(id);
         return true;
-    }
-
-    @PutMapping("/asset/{id}/promote")
-    public AssetDto promoteAsset(@PathVariable Integer id) throws Exception {
-        logger.info("Called promote asset");
-        return convertToDto(assetService.promoteAsset(id));
-    }
-
-    // Helper methods
-
-    private AssetDto convertToDto(Asset asset) {
-        return AssetDto.builder()
-                .id(asset.getId())
-                .name(asset.getName())
-                .parent(AssetDto.builder().id(asset.getParent() == null ? null : asset.getParent().getId()).build())
-                .isPromoted(asset.isPromoted())
-                .build();
-    }
-
-    private Asset convertToEntity(AssetDto assetDto) {
-        return Asset.builder()
-                .id(assetDto.getId())
-                .name(assetDto.getName() != null ? assetDto.getName() : "New Asset")
-                .parent(Asset.builder().id(assetDto.getParent() == null ? null : assetDto.getParent().getId()).build())
-                .isPromoted(assetDto.getIsPromoted() != null ? assetDto.getIsPromoted() : false)
-                .build();
     }
 }
 
