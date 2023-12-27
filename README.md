@@ -1,5 +1,7 @@
 # Collibra Challenge #
 
+### **See branch `fix-asset` for fixes post-deadline**
+
 Spring Boot application for RESTful API managing assets using MySQL for persistence.
 
 <details>
@@ -66,7 +68,6 @@ For interview questions see [Interview.md](Interview.md).
 To run in a container, complete with database, with docker installed:
 ```
 docker compose build
-docker compose pull
 docker compose up
 ```
 Then query `localhost:6868/asset`
