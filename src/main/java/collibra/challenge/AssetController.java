@@ -22,7 +22,7 @@ public class AssetController {
 
     private Logger logger = LoggerFactory.getLogger(AssetController.class);
 
-    private ModelMapper mapper = new ModelMapper();
+    private final ModelMapper mapper = new ModelMapper();
 
     @GetMapping("/asset")
     @ResponseBody
@@ -44,14 +44,42 @@ public class AssetController {
     @ResponseBody
     public AssetDto createAsset(@RequestBody AssetDto assetDto) {
         logger.info("Called create asset");
-        return mapper.map(assetService.createAsset(mapper.map(assetDto, Asset.class)), AssetDto.class);
+
+        // Converter<Integer, Asset> idToAsset = ctx -> {
+        //     Asset a = new Asset();
+        //     a.setId(ctx.getSource());
+        //     return a;
+        // };
+        // TypeMap<AssetDto, Asset> propertyMapper = this.mapper.createTypeMap(AssetDto.class, Asset.class);
+        // propertyMapper.addMappings(mapper -> {
+        //     mapper.using(idToAsset).map(AssetDto::getParentId, Asset::setParent);
+        // });
+
+        // mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
+
+        Asset asset = mapper.map(assetDto, Asset.class);
+        if (assetDto.getParentId() != null) {
+            Asset parent = new Asset();
+            parent.setId(assetDto.getParentId());
+            asset.setParent(parent);
+        }
+
+        return mapper.map(assetService.createAsset(asset), AssetDto.class);
     }
 
     @PutMapping("/asset/{id}")
     @ResponseBody
     public AssetDto updateAsset(@PathVariable Integer id, @RequestBody AssetDto assetDto) {
         logger.info("Called update asset");
-        return mapper.map(assetService.updateAsset(id, mapper.map(assetDto, Asset.class)), AssetDto.class);
+
+        Asset asset = mapper.map(assetDto, Asset.class);
+        if (assetDto.getParentId() != null) {
+            Asset parent = new Asset();
+            parent.setId(assetDto.getParentId());
+            asset.setParent(parent);
+        }
+
+        return mapper.map(assetService.updateAsset(id, asset), AssetDto.class);
     }
 
     @DeleteMapping("/asset/{id}")
@@ -59,12 +87,6 @@ public class AssetController {
         logger.info("Called delete asset");
         assetService.deleteAsset(id);
         return true;
-    }
-
-    @PutMapping("/asset/{id}/promote")
-    public AssetDto promoteAsset(@PathVariable Integer id) throws Exception {
-        logger.info("Called promote asset");
-        return mapper.map(assetService.promoteAsset(id), AssetDto.class);
     }
 }
 

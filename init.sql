@@ -1,6 +1,6 @@
 CREATE TABLE assets (
     id INT NOT NULL AUTO_INCREMENT,
-    name VARCHAR(255),
+    name VARCHAR(255) NOT NULL,
     is_promoted BOOL NOT NULL DEFAULT 0,
     parent_id int,
     PRIMARY KEY (id),
