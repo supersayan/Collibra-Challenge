@@ -1,7 +1,5 @@
 # Collibra Challenge #
 
-### **See branch `fix-asset` for fixes post-deadline**
-
 Spring Boot application for RESTful API managing assets using MySQL for persistence.
 
 <details>
